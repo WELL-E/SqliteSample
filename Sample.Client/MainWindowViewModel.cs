@@ -17,8 +17,8 @@ namespace Sample.Client
     internal class MainWindowViewModel : ViewModelBase
     {
         private DBHelper _dbHelper;
-        private System.Threading.Timer _timer;
-        //private DelegateCommand<> 
+        private Timer _timer;
+        private MessageModel _selectedMsg;
 
         public MainWindowViewModel()
         {
@@ -56,21 +56,6 @@ namespace Sample.Client
             }
         }
 
-        private ICommand _loadMsgCmd;
-
-        public ICommand LoadMsgCmd
-        {
-            get
-            {
-                if (_loadMsgCmd == null)
-                {
-                    _loadMsgCmd = new RelayCommand(InvokeLoadMsg);
-                }
-
-                return _loadMsgCmd;
-            }
-        }
-
         private int _msgCount;
 
         public int MsgCount
@@ -95,18 +80,6 @@ namespace Sample.Client
             }
         }
 
-        private int _totalCount;
-
-        public int TotalCount
-        {
-            get { return _totalCount; }
-            private set
-            {
-                _totalCount = value;
-                OnPropertyChanged("TotalCount");
-            }
-        }
-
         private string _totalTime;
 
         public string TotalTime
@@ -117,6 +90,40 @@ namespace Sample.Client
                 _totalTime = value;
                 OnPropertyChanged("TotalTime");
             }
+        }
+
+        private ICommand _loadMsgCmd;
+
+        public ICommand LoadMsgCmd
+        {
+            get
+            {
+                if (_loadMsgCmd == null)
+                {
+                    _loadMsgCmd = new RelayCommand(InvokeLoadMsg);
+                }
+
+                return _loadMsgCmd;
+            }
+        }
+
+        private DelegateCommand _deleteItemCmd;
+
+        public DelegateCommand DeleteItemCmd
+        {
+            get { return _deleteItemCmd ?? (_deleteItemCmd = new DelegateCommand(InvokeDeleteItem)); }
+            set { _deleteItemCmd = value; }
+        }
+
+        private DelegateCommand<ExCommandParameter> _selectionChangedCmd;
+
+        public DelegateCommand<ExCommandParameter> SelectionChangedCmd
+        {
+            get {
+                return _selectionChangedCmd ??
+                       (_selectionChangedCmd = new DelegateCommand<ExCommandParameter>(InvokeSelectionChanged));
+            }
+            set { _selectionChangedCmd = value; }
         }
 
         private void InvokeLoadMsg(object obj)
@@ -141,8 +148,18 @@ namespace Sample.Client
                 };
                 _messagesList.Add(msg);
             }
+        }
 
-            TotalCount = ds.Tables[0].Rows.Count;
+        private void InvokeDeleteItem()
+        {
+            MessagesList.Remove(_selectedMsg);
+        }
+
+        private void InvokeSelectionChanged(ExCommandParameter param)
+        {
+            var item = param.Parameter as MessageModel;
+            if (item == null) return;
+            _selectedMsg = item;
         }
 
         private void GetMemoryCallBack(object obj)
