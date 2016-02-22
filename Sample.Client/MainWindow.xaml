@@ -1,0 +1,103 @@
+﻿<Window x:Class="Sample.Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cmd="clr-namespace:Sample.Comm;assembly=Sample.Comm"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        Title="MainWindow"
+        Width="525"
+        Height="350"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border BorderBrush="Black" BorderThickness="1">
+                            <Grid Background="Azure">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.4*" />
+                                    <ColumnDefinition Width="0.4*" />
+                                    <ColumnDefinition Width="0.2*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="25" />
+                                    <RowDefinition Height="25" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="0"
+                                           Text="{Binding Path=MsgId}" />
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="1"
+                                           Text="{Binding Path=Title}" />
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="0"
+                                           Text="{Binding Path=Sender}" />
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="1"
+                                           Text="{Binding Path=Receiver}" />
+                                <TextBlock Grid.Row="2"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="2"
+                                           Text="{Binding Path=Body}" />
+                                <Button Grid.Row="0"
+                                        Grid.Column="2"
+                                        Content="删除" />
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="FontWeight" Value="Light" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Path=IsRead}" Value="True">
+                    <Setter Property="FontWeight" Value="Light" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=IsRead}" Value="False">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0"
+                    HorizontalAlignment="Stretch"
+                    Background="Aqua"
+                    Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Text="条数：" />
+            <TextBox Width="100"
+                     VerticalAlignment="Center"
+                     Text="{Binding Path=MsgCount}" />
+            <TextBlock Width="100"
+                       VerticalAlignment="Center"
+                       Text="{Binding Path=MemorySize, StringFormat=内存：{0}}" />
+            <Button Command="{Binding Path=LoadMsgCmd}" Content="加载数据" />
+            <TextBlock Margin="10,0,0,0"
+                       VerticalAlignment="Center"
+                       Text="{Binding Path=TotalCount, StringFormat=总条数：{0}}" />
+            <TextBlock Margin="10,0,0,0"
+                       VerticalAlignment="Center"
+                       Text="{Binding Path=TotalTime, StringFormat=时间：{0}毫秒}" />
+        </StackPanel>
+
+        <ListBox Grid.Row="1" ItemsSource="{Binding Path=MessagesList}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <cmd:ExInvokeCommandAction Command="{Binding Path=SelectionChangedCmd}" 
+                                               CommandParameter="{Binding Path=SelectedItem}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListBox>
+    </Grid>
+
+</Window>
