@@ -41,11 +41,13 @@ namespace Sample.Data.SqliteHepler
             var result = -1;
             using (var conn = new SQLiteConnection(_strConn))
             {
+                conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = command;
                     result = cmd.ExecuteNonQuery();
                 }
+                conn.Close();
             }
 
             return result;
@@ -62,11 +64,13 @@ namespace Sample.Data.SqliteHepler
             var result = -1;
             using (var conn = new SQLiteConnection(_strConn))
             {
+                conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.Parameters.AddRange(parameter);
                     result = cmd.ExecuteNonQuery();
                 }
+                conn.Close();
             }
 
             return result;
@@ -82,11 +86,13 @@ namespace Sample.Data.SqliteHepler
             object result = null;
             using (var conn = new SQLiteConnection(_strConn))
             {
+                conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = command;
                     result = cmd.ExecuteScalar();
                 }
+                conn.Close();
             }
          
             return result;
@@ -103,11 +109,13 @@ namespace Sample.Data.SqliteHepler
             object result = null;
             using (var conn = new SQLiteConnection(_strConn))
             {
+                conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.Parameters.AddRange(parmeter);
                     result = cmd.ExecuteScalar();
                 }
+                conn.Close();
             }
            
             return result;
@@ -188,6 +196,7 @@ namespace Sample.Data.SqliteHepler
             var ds = new DataSet();
             using (var conn = new SQLiteConnection(_strConn))
             {
+                conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     using (var adapter = new SQLiteDataAdapter(cmd))
@@ -196,6 +205,7 @@ namespace Sample.Data.SqliteHepler
                         sqlitecmd = cmd;
                     }
                 }   
+                conn.Close();
             }
 
             return ds;
@@ -217,6 +227,7 @@ namespace Sample.Data.SqliteHepler
             var result = -1;
             using (var conn = new SQLiteConnection(_strConn))
             {
+                conn.Open();
                 using (var adapter = new SQLiteDataAdapter(sqlitecmd))
                 {
                     using (var cmdDuilder = new SQLiteCommandBuilder(adapter))
@@ -231,6 +242,7 @@ namespace Sample.Data.SqliteHepler
                         }
                     }
                 }
+                conn.Close();
             }
           
             return result;
