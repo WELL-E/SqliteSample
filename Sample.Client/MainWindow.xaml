@@ -11,12 +11,13 @@
     <Window.Resources>
         <Style TargetType="ListBoxItem">
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Margin" Value="0,0,0,2" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
-                        <Border BorderBrush="Black" BorderThickness="1">
-                            <Grid Background="Azure">
+                        <Border Name="bd"
+                                BorderBrush="Black"
+                                BorderThickness="0,0,0,1">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="0.4*" />
                                     <ColumnDefinition Width="0.4*" />
@@ -29,12 +30,14 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0"
                                            Grid.Column="0"
+                                           Margin="5,0,5,0"
                                            Text="{Binding Path=MsgId}" />
                                 <TextBlock Grid.Row="0"
                                            Grid.Column="1"
                                            Text="{Binding Path=Title}" />
                                 <TextBlock Grid.Row="1"
                                            Grid.Column="0"
+                                           Margin="5,0,5,0"
                                            Text="{Binding Path=Sender}" />
                                 <TextBlock Grid.Row="1"
                                            Grid.Column="1"
@@ -42,26 +45,29 @@
                                 <TextBlock Grid.Row="2"
                                            Grid.Column="0"
                                            Grid.ColumnSpan="2"
+                                           Margin="5,0,5,0"
                                            Text="{Binding Path=Body}" />
                                 <Button Grid.Row="0"
                                         Grid.Column="2"
+                                        Command="{Binding ElementName=lbMsg, Path=DataContext.DeleteItemCmd}"
                                         Content="删除" />
                             </Grid>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Azure" TargetName="bd" />
+                                <Setter Property="IsSelected" Value="True"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding Path=IsRead}" Value="True">
+                                <Setter Property="FontWeight" Value="Light" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Path=IsRead}" Value="False">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="FontWeight" Value="Light" />
-                </Trigger>
-                <DataTrigger Binding="{Binding Path=IsRead}" Value="True">
-                    <Setter Property="FontWeight" Value="Light" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Path=IsRead}" Value="False">
-                    <Setter Property="FontWeight" Value="Bold" />
-                </DataTrigger>
-            </Style.Triggers>
         </Style>
     </Window.Resources>
 
@@ -84,17 +90,20 @@
             <Button Command="{Binding Path=LoadMsgCmd}" Content="加载数据" />
             <TextBlock Margin="10,0,0,0"
                        VerticalAlignment="Center"
-                       Text="{Binding Path=TotalCount, StringFormat=总条数：{0}}" />
+                       Text="{Binding Path=MessagesList.Count, StringFormat=总条数：{0}}" />
             <TextBlock Margin="10,0,0,0"
                        VerticalAlignment="Center"
                        Text="{Binding Path=TotalTime, StringFormat=时间：{0}毫秒}" />
         </StackPanel>
 
-        <ListBox Grid.Row="1" ItemsSource="{Binding Path=MessagesList}">
+        <ListBox Name="lbMsg"
+                 Grid.Row="1"
+                 ItemsSource="{Binding Path=MessagesList}"
+                 VirtualizingStackPanel.IsVirtualizing="True"
+                 VirtualizingStackPanel.VirtualizationMode="Recycling">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
-                    <cmd:ExInvokeCommandAction Command="{Binding Path=SelectionChangedCmd}" 
-                                               CommandParameter="{Binding Path=SelectedItem}" />
+                    <cmd:ExInvokeCommandAction Command="{Binding Path=SelectionChangedCmd}" CommandParameter="{Binding ElementName=lbMsg, Path=SelectedItem}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ListBox>
