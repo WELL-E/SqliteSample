@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
   </ItemGroup>
   <Choose>
@@ -59,6 +60,9 @@
       <Project>{830afeaf-336d-44c8-86d7-21a24e158a47}</Project>
       <Name>Sample.Data</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 
-namespace Sample.Data.SqliteHepler
+namespace Sample.Data.DBHepler
  {
     /// <summary>
     /// SQLiteHelper

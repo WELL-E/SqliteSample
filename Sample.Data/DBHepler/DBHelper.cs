@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 
-namespace Sample.Data
+namespace Sample.Data.DBHepler
 {
     public abstract class DBHelper
     {

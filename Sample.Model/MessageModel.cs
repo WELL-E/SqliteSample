@@ -1,7 +1,9 @@
 ﻿
+using System.ComponentModel;
+
 namespace Sample.Model
 {
-    public class MessageModel
+    public class MessageModel : INotifyPropertyChanged
     {
         public string MsgId { get; set; }
 
@@ -15,6 +17,26 @@ namespace Sample.Model
 
         public string Body { get; set; }
 
-        public bool IsRead { get; set; }
+        private bool _isRead;
+
+        public bool IsRead
+        {
+            get { return _isRead; }
+            set
+            {
+                _isRead = value;
+                //OnPropertyChanged("IsRead");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged == null) return;
+
+            var handler = PropertyChanged;
+            handler.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sample.Data;
-using Sample.Data.SqliteHepler;
+using Sample.Data.DBHepler;
 
 namespace Sample.Test
 {
     [TestClass]
     public class DataProviderTest
     {
-
         private readonly DBHelper _dbHelper;
 
         public DataProviderTest()
         {
-            var path = @"E:\C# Project\SqliteSample\Sample.Client\SampleData\sample";
+            var path = @"E:\GitHub\SqliteSample\Sample.Client\SampleData\sample";
 
             var clientConnStr = new SqlConnectionStringBuilder
             {
@@ -47,6 +45,12 @@ namespace Sample.Test
                 sqls.Add(sql);
             }
             _dbHelper.BatchExecute(sqls);
+        }
+
+        [TestMethod]
+        public void TestDelete()
+        {
+            _dbHelper.Execute("delete from messages");
         }
     }
 }

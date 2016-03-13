@@ -7,9 +7,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using System.Windows.Input;
+using Sample.Client.Hepler;
 using Sample.Comm;
-using Sample.Data;
-using Sample.Data.SqliteHepler;
+using Sample.Data.DBHepler;
 using Sample.Model;
 
 namespace Sample.Client
@@ -42,29 +42,13 @@ namespace Sample.Client
             _timer = new Timer(GetMemoryCallBack, null, 0, 1000);
         }
 
-        private ObservableCollection<MessageModel> _messagesList; 
+        //private VirtualizingList<MessageModel> _messagesList; 
 
-        public ObservableCollection<MessageModel> MessagesList
+        public VirtualizingList<MessageModel> MessagesList
         {
             get
             {
-                if (_messagesList == null)
-                {
-                    _messagesList = new ObservableCollection<MessageModel>();
-                }
-                return _messagesList;
-            }
-        }
-
-        private int _msgCount;
-
-        public int MsgCount
-        {
-            get { return _msgCount; }
-            set
-            {
-                _msgCount = value;
-                OnPropertyChanged("MsgCount");
+                return InvokeLoadMsg(); 
             }
         }
 
@@ -92,21 +76,21 @@ namespace Sample.Client
             }
         }
 
-        private ICommand _loadMsgCmd;
+        /// <summary>
+        /// 增加一条数据命令
+        /// </summary>
+        private DelegateCommand _addItemCmd;
 
-        public ICommand LoadMsgCmd
+        public DelegateCommand AddItemCmd
         {
-            get
-            {
-                if (_loadMsgCmd == null)
-                {
-                    _loadMsgCmd = new RelayCommand(InvokeLoadMsg);
-                }
-
-                return _loadMsgCmd;
-            }
+            get { return _addItemCmd ?? (_addItemCmd = new DelegateCommand(InvokeAddItem)); }
+            set { _addItemCmd = value; }
         }
 
+
+        /// <summary>
+        /// 删除数据命令
+        /// </summary>
         private DelegateCommand _deleteItemCmd;
 
         public DelegateCommand DeleteItemCmd
@@ -115,39 +99,40 @@ namespace Sample.Client
             set { _deleteItemCmd = value; }
         }
 
-        private DelegateCommand<ExCommandParameter> _selectionChangedCmd;
+        /// <summary>
+        /// 选择数据项改变命令
+        /// </summary>
+        private DelegateCommand<ExCommandParameter> _mouseDownCmd;
 
-        public DelegateCommand<ExCommandParameter> SelectionChangedCmd
+        public DelegateCommand<ExCommandParameter> MouseDownCmd
         {
             get {
-                return _selectionChangedCmd ??
-                       (_selectionChangedCmd = new DelegateCommand<ExCommandParameter>(InvokeSelectionChanged));
+                return _mouseDownCmd ??
+                       (_mouseDownCmd = new DelegateCommand<ExCommandParameter>(InvokeSelectedItem));
             }
-            set { _selectionChangedCmd = value; }
+            set { _mouseDownCmd = value; }
         }
 
-        private void InvokeLoadMsg(object obj)
+        private VirtualizingList<MessageModel>  InvokeLoadMsg()
         {
             var watcher = new Stopwatch();
             watcher.Start();
-            var ds = _dbHelper.GetDataSet("select * from messages");
+            //邮件总数
+            var count = DbOperator.GetMessageCount(_dbHelper);
+
+            //获取邮件
+            var mailProvider = new MessageProvider(count, 1000) { DbHelper = _dbHelper };
+
+            var list = new VirtualizingList<MessageModel>(mailProvider, 100, 1000);
             watcher.Stop();
             TotalTime = watcher.ElapsedMilliseconds.ToString(CultureInfo.InvariantCulture);
 
-            foreach (DataRow row in ds.Tables[0].Rows)
-            {
-                var msg = new MessageModel
-                {
-                    MsgId = row["MsgId"].ToString(),
-                    Title = row["Title"].ToString(),
-                    Sender = row["Sender"].ToString(),
-                    Receiver = row["Receiver"].ToString(),
-                    RecvTime = row["RecvTime"].ToString(),
-                    Body = row["Body"].ToString(),
-                    IsRead = Convert.ToBoolean(row["IsRead"]) 
-                };
-                _messagesList.Add(msg);
-            }
+            return list;
+        }
+
+        private void InvokeAddItem()
+        {
+            
         }
 
         private void InvokeDeleteItem()
@@ -155,11 +140,14 @@ namespace Sample.Client
             MessagesList.Remove(_selectedMsg);
         }
 
-        private void InvokeSelectionChanged(ExCommandParameter param)
+        private void InvokeSelectedItem(ExCommandParameter param)
         {
             var item = param.Parameter as MessageModel;
             if (item == null) return;
             _selectedMsg = item;
+
+            _selectedMsg.IsRead = true;
+            OnPropertyChanged("IsRead");
         }
 
         private void GetMemoryCallBack(object obj)

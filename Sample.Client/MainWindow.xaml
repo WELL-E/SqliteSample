@@ -10,7 +10,6 @@
 
     <Window.Resources>
         <Style TargetType="ListBoxItem">
-            <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
@@ -32,7 +31,8 @@
                                            Grid.Column="0"
                                            Margin="5,0,5,0"
                                            Text="{Binding Path=MsgId}" />
-                                <TextBlock Grid.Row="0"
+                                <TextBlock Name="tblTitle"  
+                                           Grid.Row="0"
                                            Grid.Column="1"
                                            Text="{Binding Path=Title}" />
                                 <TextBlock Grid.Row="1"
@@ -52,17 +52,24 @@
                                         Command="{Binding ElementName=lbMsg, Path=DataContext.DeleteItemCmd}"
                                         Content="删除" />
                             </Grid>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <cmd:ExInvokeCommandAction Command="{Binding ElementName=lbMsg, Path=DataContext.MouseDownCmd}" 
+                                               CommandParameter="{Binding ElementName=lbMsg, Path=SelectedItem}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
                         </Border>
                         <ControlTemplate.Triggers>
+                            
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="Azure" TargetName="bd" />
                                 <Setter Property="IsSelected" Value="True"/>
                             </Trigger>
                             <DataTrigger Binding="{Binding Path=IsRead}" Value="True">
-                                <Setter Property="FontWeight" Value="Light" />
+                                <Setter Property="FontWeight" Value="Light" TargetName="tblTitle"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Path=IsRead}" Value="False">
-                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="FontWeight" Value="Bold" TargetName="tblTitle"/>
                             </DataTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -80,20 +87,20 @@
                     HorizontalAlignment="Stretch"
                     Background="Aqua"
                     Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Text="条数：" />
+            <Button Content="增加一条数据" Command="{Binding Path=AddItemCmd}"/>
+            
             <TextBox Width="100"
                      VerticalAlignment="Center"
                      Text="{Binding Path=MsgCount}" />
             <TextBlock Width="100"
                        VerticalAlignment="Center"
                        Text="{Binding Path=MemorySize, StringFormat=内存：{0}}" />
-            <Button Command="{Binding Path=LoadMsgCmd}" Content="加载数据" />
             <TextBlock Margin="10,0,0,0"
                        VerticalAlignment="Center"
                        Text="{Binding Path=MessagesList.Count, StringFormat=总条数：{0}}" />
             <TextBlock Margin="10,0,0,0"
                        VerticalAlignment="Center"
-                       Text="{Binding Path=TotalTime, StringFormat=时间：{0}毫秒}" />
+                       Text="{Binding Path=TotalTime, StringFormat=时间：{0}毫秒}" />    
         </StackPanel>
 
         <ListBox Name="lbMsg"
@@ -101,11 +108,7 @@
                  ItemsSource="{Binding Path=MessagesList}"
                  VirtualizingStackPanel.IsVirtualizing="True"
                  VirtualizingStackPanel.VirtualizationMode="Recycling">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <cmd:ExInvokeCommandAction Command="{Binding Path=SelectionChangedCmd}" CommandParameter="{Binding ElementName=lbMsg, Path=SelectedItem}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+          
         </ListBox>
     </Grid>
 

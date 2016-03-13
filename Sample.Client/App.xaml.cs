@@ -13,5 +13,11 @@ namespace Sample.Client
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            //创建数据库
+
+            base.OnStartup(e);
+        }
     }
 }
